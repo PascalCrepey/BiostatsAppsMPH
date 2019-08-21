@@ -12,20 +12,20 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
-# BiostatApps
+# BiostatAppsMPH
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- badges: end -->
 
-The goal of BiostatApps is to ...
+The goal of BiostatAppsMPH is to ...
 
 ## Installation
 
-You can install the released version of BiostatApps from [CRAN](https://CRAN.R-project.org) with:
+You can install the released version of BiostatAppsMPH from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
-install.packages("BiostatApps")
+install.packages("BiostatAppsMPH")
 ```
 
 ## Example
@@ -33,7 +33,7 @@ install.packages("BiostatApps")
 This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
-library(BiostatApps)
+library(BiostatAppsMPH)
 ## basic example code
 ```
 

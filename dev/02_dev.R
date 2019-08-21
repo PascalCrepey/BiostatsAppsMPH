@@ -7,16 +7,17 @@
 
 ## 2.1 Add modules
 ## 
-golem::add_module( name = "my_first_module" ) # Name of the module
-golem::add_module( name = "my_other_module" ) # Name of the module
+golem::add_module( name = "power" ) # Name of the module
+golem::add_module( name = "logistic_regression" ) # Name of the module
 
 ## 2.2 Add dependencies
 
-usethis::use_package( "thinkr" ) # To call each time you need a new package
+#usethis::use_package( "thinkr" ) # To call each time you need a new package
 
 ## 2.3 Add tests
 
-usethis::use_test( "app" )
+usethis::use_test( "power" )
+usethis::use_test( "logistic_regression" )
 
 ## 2.4 Add a browser button
 
@@ -36,9 +37,9 @@ devtools::build_vignettes()
 
 ## 3.2 Code coverage
 ## You'll need GitHub there
-usethis::use_github()
-usethis::use_travis()
-usethis::use_appveyor()
+# usethis::use_github()
+# usethis::use_travis()
+# usethis::use_appveyor()
 
 # You're now set! 
 # go to dev/03_deploy.R

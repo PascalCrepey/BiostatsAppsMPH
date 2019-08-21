@@ -9,9 +9,9 @@
 ## Add information about the package that will contain your app
 
 golem::fill_desc(
-  pkg_name = "BiostatApps", # The Name of the package containing the App 
+  pkg_name = "BiostatAppsMPH", # The Name of the package containing the App 
   pkg_title = "BiostatApps for EHESP MPH2", # The Title of the package containing the App 
-  pkg_description = "This package contains a set of illustrative shiny apps for EHESP MPH 2 students.
+  pkg_description = "The *BiostatAppsMPH* package contains a set of illustrative shiny apps for EHESP MPH 2 students.
   It is in an experimental stage for the moment.", # The Description of the package containing the App 
   author_first_name = "Pascal", # Your First Name
   author_last_name = "Crépey",  # Your Last Name

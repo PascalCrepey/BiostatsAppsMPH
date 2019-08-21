@@ -1,13 +1,20 @@
-Package: BiostatApps
+Package: BiostatAppsMPH
 Title: BiostatApps for EHESP MPH2
 Version: 0.0.0.9000
 Authors@R: person('Pascal', 'Crépey', email = 'pascal.crepey@ehesp.fr', role = c('cre', 'aut'))
-Description: This package contains a set of illustrative shiny apps for EHESP MPH 2 students.
+Description: The *BiostatAppsMPH* package contains a set of illustrative shiny apps for EHESP MPH 2 students.
   It is in an experimental stage for the moment.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    shiny, 
-    golem
+    shiny,
+    golem,
+    processx,
+    attempt,
+    DT,
+    glue,
+    htmltools
 RoxygenNote: 6.1.0
+Suggests: 
+    testthat

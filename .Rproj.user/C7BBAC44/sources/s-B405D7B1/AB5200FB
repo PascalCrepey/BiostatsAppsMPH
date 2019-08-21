@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1566380521431.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "469209384",
+    "id" : "AB5200FB",
+    "lastKnownWriteTime" : 1566380898,
+    "last_content_update" : 1566380898082,
+    "path" : "~/Google Drive/0-Enseignement/MPH2/BiostatApps/dev/01_start.R",
+    "project_path" : "dev/01_start.R",
+    "properties" : {
+        "cursorPosition" : "15,49",
+        "scrollLine" : "6"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

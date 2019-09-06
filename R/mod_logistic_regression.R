@@ -1,8 +1,8 @@
 # Module UI
-library(data.table)
-library(mosaicData)
-library(ggplot2)
-library(cowplot)
+# library(data.table)
+# library(mosaicData)
+# library(ggplot2)
+# library(cowplot)
 
 
 
@@ -61,12 +61,13 @@ mod_logistic_regression_ui <- function(id){
     
 #' @rdname mod_logistic_regression
 #' @import data.table
+#' @import ggplot2
+#' @import cowplot
 #' @export
 #' @keywords internal
-    
 mod_logistic_regression_server <- function(input, output, session){
   ns <- session$ns
-  data("Whickham")
+  #data("Whickham")
   regress_data <- setDT(Whickham)
   regress_data <- regress_data[,outcome := 1 * (outcome == "Dead")]
   regress_data[, label_age_class := cut(age, breaks = 10, 

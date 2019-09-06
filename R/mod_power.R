@@ -117,7 +117,8 @@ mod_power_ui <- function(id){
 #' @rdname mod_power
 #' @export
 #' @keywords internal
-    
+#' @import data.table
+#' @importFrom stats binomial dchisq dnorm glm power.t.test rnorm t.test 
 mod_power_server <- function(input, output, session){
   ns <- session$ns
   

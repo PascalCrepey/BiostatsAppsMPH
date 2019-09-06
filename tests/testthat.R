@@ -1,4 +1,4 @@
 library(testthat)
 library(BiostatAppsMPH)
 
-test_check("BiostatApps")
+test_check("BiostatAppsMPH")

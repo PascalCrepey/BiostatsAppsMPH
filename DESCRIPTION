@@ -9,12 +9,17 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     shiny,
+    data.table,
+    shinydashboard,
     golem,
     processx,
     attempt,
     DT,
     glue,
-    htmltools
+    htmltools,
+    pkgload, 
+    ggplot2,
+    cowplot
 RoxygenNote: 6.1.1
 Suggests: 
     testthat (>= 2.1.0),

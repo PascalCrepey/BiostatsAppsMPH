@@ -60,7 +60,6 @@ mod_power_ui <- function(id){
                          )),
                 tabPanel("You don't know it but H0 is FALSE ! Be careful to type 2 error",
                          fluidRow(
-                           # Sidebar with a slider input for number of bins
                            column(4, tabsetPanel(id = ns("navbar2"),
                                                  tabPanel("Parameters",wellPanel(
                                                    sliderInput(ns("refbloodpressure2"),"Reference blood pressure",
@@ -75,12 +74,7 @@ mod_power_ui <- function(id){
                                                                min=5,
                                                                max=100,
                                                                value=25, animate=T, step=5),
-                                                   #                                        sliderInput("effectsize2", "Estimated effect size",
-                                                   #                                                    min = 1,
-                                                   #                                                    max = 10,
-                                                   #                                                    value = 2, animate=T, step=0.5),
-                                                   #                                        h4("To change the conditions of the studies:"), 
-                                                   sliderInput(ns("groupsize2"), "Group size",
+                                                  sliderInput(ns("groupsize2"), "Group size",
                                                                min = 50,
                                                                max = 1000,
                                                                value = 100, animate=T, step=50),
@@ -100,13 +94,34 @@ mod_power_ui <- function(id){
                                       hr(),
                                       #h5("VE is computed with 1-OR, OR is computed with a logistic regression on each simulated case-control settings."),
                                       fluidRow(column(12,verbatimTextOutput(ns("summaryEfficacy2")))) 
-                             ), 
-                             tabPanel("Distributions of measures", 
-                                      fluidRow(column(12,plotOutput(ns("distributions")))))
+                             )
                            )
                            )
                          )
-                )
+                ), 
+                tabPanel("Distributions of measures", 
+                         fluidRow(column(4, tabsetPanel(id = ns("navbarD"),
+                                                        tabPanel("Parameters",wellPanel(
+                                                          sliderInput(ns("refbloodpressureD"),"True blood pressure under H_0",
+                                                                      min = 100,
+                                                                      max = 150,
+                                                                      value = 130, animate = T, step = 1),
+                                                          sliderInput(ns("sdDref"),"standard deviation of your measure",
+                                                                      min = 1,
+                                                                      max = 50,
+                                                                      value = 10, animate = T, step = 1 ),
+                                                          sliderInput(ns("diffriskbloodpressureD"),"Expected difference in your risk group",
+                                                                      min = 0,
+                                                                      max = 30,
+                                                                      value = 5, animate = T, step = 1),
+                                                          sliderInput(ns("groupsizeD"), "size of your risk group sample",
+                                                                      min = 50,
+                                                                      max = 1000,
+                                                                      value = 100, animate = T, step = 50)
+                                                          
+                                                        ))
+                         )),
+                         column(8, fluidRow(column(12,style = "margin-top:30px", plotOutput(ns("distributions")))))))
     )
   
   )
@@ -232,21 +247,52 @@ mod_power_server <- function(input, output, session){
     #     p
   })
   
-  output$distributions<-renderPlot({
-    minval=min(input$refbloodpressure2, input$truebloodpressure)-10*ceiling(3*input$sd2/sqrt(input$groupsize2)/10)
-    maxval=max(input$refbloodpressure2, input$truebloodpressure)+10*ceiling(3*input$sd2/sqrt(input$groupsize2)/10)
+  output$distributions <- renderPlot({
+    groupsize = input$groupsizeD
+    refBP = input$refbloodpressureD
+    riskBP = refBP + input$diffriskbloodpressureD
+    sdDref = input$sdDref
+    sdDrisk = input$sdDref
+    
+    minval = min(refBP, riskBP) - max(sdDref,sdDrisk)
+    maxval = max(refBP, riskBP) + max(sdDref,sdDrisk)
+    minval = min(refBP, riskBP) - 10
+    maxval = max(refBP, riskBP) + 10
     #reference distrib
-    data=data.table(x=seq(minval, maxval, 0.1))
-    data[, normRef:=dnorm(x, mean=input$refbloodpressure2, sd = input$sd2/sqrt(input$groupsize2))/sqrt(dchisq(x,input$groupsize2)/input$groupsize2)]
-    data[, normPop:=dnorm(x, mean=input$truebloodpressure, sd = input$sd2/sqrt(input$groupsize2))/sqrt(dchisq(x,input$groupsize2)/input$groupsize2)]
-    p <- ggplot(data, aes(x=x)) +
-      geom_line(aes(y=normRef), color="black") +
-      geom_line(aes(y=normPop), color="blue") +
-      geom_abline(slope=0, intercept = 0)+
-      geom_vline(xintercept = input$refbloodpressure2, color="black")+
-      geom_vline(xintercept = input$truebloodpressure, color="blue") +
-      geom_vline(xintercept=input$refbloodpressure2+1.96*input$sd2/sqrt(input$groupsize2), color="green")+
-      scale_y_continuous(limits=c(0,1.1*max(data[,.(normRef, normPop)])))
+    data = data.table(x = seq(minval, maxval, 0.001))
+    #data[, normRef := dnorm(x, mean = input$refbloodpressureD, sd = input$sdD)]
+    #data[, normPop := dnorm(x, mean = input$truebloodpressureD, sd = input$sdD / sqrt(groupsize)) / sqrt(dchisq(x,groupsize) / groupsize)]
+    #browser()
+
+    dnorm_b <- function(x, mean, sd, ub = NA, lb = NA){
+      y <- dnorm(x = x, mean = mean, sd = sd)
+      if (!is.na(ub)) y[x > ub] <- NA
+      if (!is.na(lb)) y[x <= lb] <- NA
+      return(y)
+    }
+    
+    thresholdSig = qnorm(p = 0.05, mean = refBP, sd = sdDref / sqrt(groupsize), lower.tail = FALSE)
+    ValPower = paste0(round(
+      pnorm(thresholdSig, 
+            mean = riskBP, 
+            sd = sdDrisk / sqrt(groupsize), 
+            lower.tail = FALSE) * 100,
+      2),"%")
+    midY = max(dnorm(x = data$x, mean = refBP, sd = sdDref / sqrt(groupsize)),
+               dnorm(x = data$x, mean = riskBP, sd = sdDrisk / sqrt(groupsize)))/2
+    p <- ggplot(data, aes(x = x)) +
+      stat_function(fun = dnorm_b, args = list(mean = refBP, sd = sdDref / sqrt(groupsize)), color = "black") +
+      stat_function(fun = dnorm_b, args = list(mean = riskBP, sd = sdDrisk / sqrt(groupsize)), color = "blue") +
+      stat_function(fun = dnorm_b, 
+                    args = list(mean = riskBP, sd = sdDrisk / sqrt(groupsize), 
+                                lb = thresholdSig),
+                    fill = "gray", color = NA, alpha = 0.5, geom = "area") +
+      geom_abline(slope = 0, intercept = 0) +
+      geom_vline(xintercept = refBP, color = "black") +
+      geom_vline(xintercept = riskBP, color = "blue") +
+      geom_vline(xintercept = thresholdSig, size = 2, color = "green") +
+      annotate(geom = "label", label = paste0("Power: ", ValPower), x = thresholdSig*1.01, y = midY) +
+      theme_classic(14)
     p
   })
   

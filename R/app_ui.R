@@ -5,6 +5,8 @@ app_ui <- function() {
     sidebarMenu(id = "sideMenu",
                 menuItem("Logistic Regression", icon = icon("th"), tabName = "LogisticRegression",
                          badgeLabel = "new", badgeColor = "green", selected = TRUE),
+                menuItem("Probit Regression", icon = icon("chart-line"), tabName = "ProbitRegression",
+                         badgeLabel = "new", badgeColor = "green", selected = FALSE),
                 menuItem("Power", icon = icon("th"), tabName = "Power",
                          badgeLabel = "new", badgeColor = "green", selected = FALSE)
     )
@@ -13,6 +15,11 @@ app_ui <- function() {
     tabItem(tabName = "LogisticRegression",
             fluidPage(
               mod_logistic_regression_ui("logistic_regression_ui_1")
+            )
+    ),
+    tabItem(tabName = "ProbitRegression",
+            fluidPage(
+              mod_probit_regression_ui("probit_regression_ui_1")
             )
     ),
     tabItem(tabName = "Power",

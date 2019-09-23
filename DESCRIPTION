@@ -7,6 +7,8 @@ Description: The *BiostatAppsMPH* package contains a set of illustrative shiny a
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Depends: 
+    R (>= 2.10)
 Imports: 
     shiny,
     data.table,

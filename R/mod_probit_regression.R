@@ -6,7 +6,7 @@
 
 
 
-#' @title   mod_logistic_regression_ui and mod_logistic_regression_server
+#' @title   mod_probit_regression_ui and mod_probit_regression_server
 #' @description  A shiny Module.
 #'
 #' @param id shiny id
@@ -14,12 +14,12 @@
 #' @param output internal
 #' @param session internal
 #'
-#' @rdname mod_logistic_regression
+#' @rdname mod_probit_regression
 #'
 #' @keywords internal
 #' @export 
 #' @importFrom shiny NS tagList 
-mod_logistic_regression_ui <- function(id){
+mod_probit_regression_ui <- function(id){
   ns <- NS(id)
   tagList(
     withMathJax(),
@@ -31,8 +31,9 @@ mod_logistic_regression_ui <- function(id){
     fluidRow(
       column(3,
              h4(strong("Formula: \n")),
-             h5("$$logit(p(y=1|x)) = \\beta_0 + \\beta_1.x$$"),
-             uiOutput(ns("OR"))
+             h5("$$p(y=1|x) = \\phi(\\beta_0 + \\beta_1.x)$$"),
+             uiOutput(ns("MEM")),
+             uiOutput(ns("AME"))
       ),
       column(3,       
              sliderInput(ns("Slider_a"),
@@ -56,20 +57,22 @@ mod_logistic_regression_ui <- function(id){
     )
   )
 }
-    
+
 # Module Server
-    
-#' @rdname mod_logistic_regression
+
+#' @rdname mod_probit_regression
 #' @import data.table
 #' @import ggplot2
 #' @import cowplot
 #' @export
 #' @keywords internal
-mod_logistic_regression_server <- function(input, output, session){
+mod_probit_regression_server <- function(input, output, session){
   ns <- session$ns
   #data("Whickham")
   regress_data <- copy(setDT(Whickham))
+  #browser()
   regress_data <- regress_data[,outcome := 1 * (outcome == "Dead")]
+
   regress_data[, label_age_class := cut(age, breaks = 10, 
                                         include.lowest = TRUE)]
   regress_data[, age_class := (min(age) + max(age)) / 2,
@@ -80,7 +83,7 @@ mod_logistic_regression_server <- function(input, output, session){
            c("y", "x", "x_class"))
   
   model_glm <- glm(y ~ x,
-                   family = binomial(link = "logit"),
+                   family = binomial(link = "probit"),
                    data = regress_data)
   
   observeEvent(input$buttonRegress, {
@@ -96,20 +99,16 @@ mod_logistic_regression_server <- function(input, output, session){
     regress_data[, 
                  .(y, 
                    x,
-                   estimated = exp(input$Slider_a +
-                                     input$Slider_b * x)/
-                     (1 + exp(input$Slider_a +
-                                input$Slider_b * x)))]
+                   estimated = pnorm(input$Slider_a +
+                                       input$Slider_b * x))]
   })
   
   data_aggregated <- reactive({
     regress_data[ , 
                   .(observed = mean(y),
-                    estimated = exp(input$Slider_a +
-                                      input$Slider_b * x_class)/
-                      (1 + exp(input$Slider_a +
-                                 input$Slider_b * x_class)),
-                    observed_logodds = log(mean(y)/(1-mean(y))),
+                    estimated = pnorm(input$Slider_a +
+                                      input$Slider_b * x_class),
+                    observed_logodds = qnorm(mean(y)),
                     estimated_logodds = input$Slider_a +
                       input$Slider_b * x_class),
                   by = "x_class"]})
@@ -147,10 +146,10 @@ mod_logistic_regression_server <- function(input, output, session){
       theme_minimal(16) +
       geom_point(aes(y = observed_logodds), size = 3) +
       xlab("x") +
-      ylab("logit(p(y=1|x))") +
+      ylab(expression({phi^{-1}}(p(y==1 ~ "|" ~ x)))) +
       geom_line(aes(y = estimated_logodds), colour = "red",
                 lwd = 1.5) +
-      labs(title = "logit(p(y=1))=f(x)") +
+      labs(title = expression({phi^{-1}}(p(y==1 ~ "|" ~ x))==f(x))) +
       theme(plot.title = element_text(hjust = 0.5, 
                                       face = "bold.italic"))
     
@@ -160,15 +159,16 @@ mod_logistic_regression_server <- function(input, output, session){
               nrow = 1)
   })
   
-  output$OR <- renderUI({ 
-    withMathJax(sprintf("\\(OR_{\\beta_1}\\) = %.03f", round(exp(as.numeric(input$Slider_b)), 2)))
+  output$MEM <- renderUI({ 
+    withMathJax(sprintf("\\(MEM_{x}\\) = %.03f%%", round(input$Slider_b * 
+                                                              pnorm(input$Slider_a + 
+                                                                      input$Slider_b * mean(regress_data$x))*100, 2)))
+  })
+  output$AME <- renderUI({ 
+    withMathJax(sprintf("\\(AME_{x}\\) = %.03f%%", round(mean(input$Slider_b * 
+                                                         pnorm(input$Slider_a + 
+                                                                 input$Slider_b * (regress_data$x)))*100, 2)))
   })
   
 }
-    
-## To be copied in the UI
-# mod_logistic_regression_ui("logistic_regression_ui_1")
-    
-## To be copied in the server
-# callModule(mod_logistic_regression_server, "logistic_regression_ui_1")
- 
+

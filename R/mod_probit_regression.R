@@ -41,7 +41,7 @@ mod_probit_regression_ui <- function(id){
                          min = -10,
                          max = 10,
                          value = 0,
-                         step = 0.01)
+                         step = 0.0001)
       ),
       column(3,
              sliderInput(ns("Slider_b"),
@@ -49,7 +49,7 @@ mod_probit_regression_ui <- function(id){
                          min = -1,
                          max = 1,
                          value = 0,
-                         step = 0.01)
+                         step = 0.0001)
       ),
       column(2,
              actionButton(ns("buttonRegress"), "Regress")
@@ -119,11 +119,11 @@ mod_probit_regression_server <- function(input, output, session){
              aes(x = x)) +
       theme_minimal(16) +
       geom_point(aes(y = y), size = 3) +
-      xlab("x") +
-      ylab("y") +
+      xlab("age") +
+      ylab("death") +
       geom_line(aes(y = estimated), colour = "red",
                 lwd = 1.5) +
-      labs(title = "y=f(x)") +
+      labs(title = "death=f(age)") +
       theme(plot.title = element_text(hjust = 0.5,
                                       face = "bold.italic"))
     
@@ -132,42 +132,40 @@ mod_probit_regression_server <- function(input, output, session){
              aes(x = x_class)) +
       theme_minimal(16) +
       geom_point(aes(y = observed), size = 3) +
-      xlab("x") +
-      ylab("p(y=1|x)") +
+      xlab("age") +
+      ylab("p(death=1|age)") +
       geom_line(aes(y = estimated), colour = "red",
                 lwd = 1.5) +
-      labs(title = "p(y=1)=f(x)") +
+      labs(title = "p(death=1|age)") +
       theme(plot.title = element_text(hjust = 0.5,
                                       face = "bold.italic"))
     
-    FigPlot_logodds <- 
+    FigPlot_phi <- 
       ggplot(data = data_aggregated(), 
              aes(x = x_class)) +
       theme_minimal(16) +
       geom_point(aes(y = observed_logodds), size = 3) +
-      xlab("x") +
-      ylab(expression({phi^{-1}}(p(y==1 ~ "|" ~ x)))) +
+      xlab("age") +
+      ylab(expression({phi^{-1}}(p(death==1 ~ "|" ~ age)))) +
       geom_line(aes(y = estimated_logodds), colour = "red",
                 lwd = 1.5) +
-      labs(title = expression({phi^{-1}}(p(y==1 ~ "|" ~ x))==f(x))) +
+      labs(title = expression({phi^{-1}}(p(death==1 ~ "|" ~ age)))) +
       theme(plot.title = element_text(hjust = 0.5, 
                                       face = "bold.italic"))
     
     plot_grid(FigPlot_y,
               FigPlot_p, 
-              FigPlot_logodds,
+              FigPlot_phi,
               nrow = 1)
   })
   
   output$MEM <- renderUI({ 
-    withMathJax(sprintf("\\(MEM_{x}\\) = %.03f%%", round(input$Slider_b * 
-                                                              pnorm(input$Slider_a + 
-                                                                      input$Slider_b * mean(regress_data$x))*100, 2)))
+    withMathJax(paste0("$$ MEM_{x} = \\beta_{1} * dnorm(\\beta_{0} + \\beta_{1} * mean(x))=", 
+                        round(input$Slider_b * dnorm(input$Slider_a + input$Slider_b * mean(regress_data$x))*100, 2),"\\% $$"))
   })
   output$AME <- renderUI({ 
-    withMathJax(sprintf("\\(AME_{x}\\) = %.03f%%", round(mean(input$Slider_b * 
-                                                         pnorm(input$Slider_a + 
-                                                                 input$Slider_b * (regress_data$x)))*100, 2)))
+    withMathJax(paste0("$$ AME_{x}  = mean(\\beta_{1} * dnorm(\\beta_{0} + \\beta_{1} * x))=", 
+                        round(mean(input$Slider_b * dnorm(input$Slider_a + input$Slider_b * (regress_data$x)))*100, 2),"\\% $$"))
   })
   
 }

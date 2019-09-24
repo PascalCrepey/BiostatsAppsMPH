@@ -161,7 +161,7 @@ mod_logistic_regression_server <- function(input, output, session){
   })
   
   output$OR <- renderUI({ 
-    withMathJax(sprintf("\\(OR_{\\beta_1}\\) = %.03f", round(exp(as.numeric(input$Slider_b)), 2)))
+    withMathJax(paste0("$$ OR_{\\beta_1} = e^{\\beta_1} = ", round(exp(as.numeric(input$Slider_b)), 2)," $$"))
   })
   
 }

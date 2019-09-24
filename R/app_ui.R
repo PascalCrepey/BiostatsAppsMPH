@@ -1,5 +1,6 @@
 #' @import shiny
 #' @import shinydashboard
+#' @import shinyWidgets
 app_ui <- function() {
   sidebar <- dashboardSidebar(
     sidebarMenu(id = "sideMenu",

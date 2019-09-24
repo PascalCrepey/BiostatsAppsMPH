@@ -50,8 +50,8 @@ mod_logistic_regression_ui <- function(id){
                          value = 0,
                          step = 0.01)
       ),
-      column(2,
-             actionButton(ns("buttonRegress"), "Regress")
+      column(3,style = "padding:30px",
+             actionBttn(ns("buttonRegress"), "Regress", icon = icon("atom"), color = "primary")
       )
     )
   )

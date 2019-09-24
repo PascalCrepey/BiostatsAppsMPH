@@ -5,8 +5,8 @@ account: ehesp
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 1158634
-bundleId: 2438826
+bundleId: 2440716
 url: https://ehesp.shinyapps.io/MPHBiostatApps/
-when: 1569280821.23551
+when: 1569333971.44459
 asMultiple: FALSE
 asStatic: FALSE

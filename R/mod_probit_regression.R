@@ -25,15 +25,26 @@ mod_probit_regression_ui <- function(id){
     withMathJax(),
     plotOutput(ns('plot_regress'),
                height = "500px"),
-    
+    fluidRow(
+      column(4,
+             h5("Black dots stands for raw data, 1 is death, 0 is alive.\n
+                Red line stands for estimated probabilities of death by age according to \\(pnorm(\\beta_0 + \\beta_1 * age)\\)")
+      ),
+      column(4,
+             h5("Black dots stands for observed probability of death by age.\n
+                Red line stands for estimated probabilities of death by age according to \\(pnorm(\\beta_0 + \\beta_1 * age)\\)")),
+      column(4,
+             h5("Black dots stands for \\(Z\\) values in a standard normal cumulative distribution for observed probabilities of death by age, 
+             given by qnorm(p(death|age)).\nRed line is simply \\(y = \\beta_0 + \\beta_1 * age\\)."))
+    ),
     hr(),
-    
     fluidRow(
       column(3,
              h4(strong("Formula: \n")),
              h5("$$p(y=1|x) = \\phi(\\beta_0 + \\beta_1.x)$$"),
              uiOutput(ns("MEM")),
-             uiOutput(ns("AME"))
+             uiOutput(ns("AME")),
+             uiOutput(ns("formula"))
       ),
       column(3,       
              sliderInput(ns("Slider_a"),
@@ -51,8 +62,8 @@ mod_probit_regression_ui <- function(id){
                          value = 0,
                          step = 0.0001)
       ),
-      column(2,
-             actionButton(ns("buttonRegress"), "Regress")
+      column(3,style = "padding:30px",
+             actionBttn(ns("buttonRegress"), "Regress", icon = icon("atom"), color = "primary")
       )
     )
   )
@@ -64,6 +75,7 @@ mod_probit_regression_ui <- function(id){
 #' @import data.table
 #' @import ggplot2
 #' @import cowplot
+#' @importFrom stats pnorm qnorm dnorm
 #' @export
 #' @keywords internal
 mod_probit_regression_server <- function(input, output, session){
@@ -166,6 +178,9 @@ mod_probit_regression_server <- function(input, output, session){
   output$AME <- renderUI({ 
     withMathJax(paste0("$$ AME_{x}  = mean(\\beta_{1} * dnorm(\\beta_{0} + \\beta_{1} * x))=", 
                         round(mean(input$Slider_b * dnorm(input$Slider_a + input$Slider_b * (regress_data$x)))*100, 2),"\\% $$"))
+  })
+  output$formula <- renderUI({
+    withMathJax(paste0("$$ \\phi^{-1} = qnorm()$$\n$$\\phi = pnorm()$$"))
   })
   
 }
